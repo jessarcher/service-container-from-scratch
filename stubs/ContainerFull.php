@@ -109,7 +109,8 @@ class Container
 
         foreach ($dependencies as $dependency) {
             // This is a much simpler version of what Laravel does
-            $type = $dependency->getType();
+
+            $type = $dependency->getType(); // ReflectionType|null
 
             if (!$type instanceof \ReflectionNamedType || $type->isBuiltin()) {
                 throw new BindingResolutionException("Unresolvable dependency resolving [$dependency] in class {$dependency->getDeclaringClass()->getName()}");

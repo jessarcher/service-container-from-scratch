@@ -30,7 +30,7 @@ class Pdf
 
     public static function shouldReceive()
     {
-        if (! static::$mock) {
+        if (!static::$mock) {
             $object = Container::getInstance()->make(static::getFacadeAccessor());
             static::$mock = Mockery::mock($object);
         }

@@ -13,28 +13,17 @@ class ContainerTest extends TestCase
         /*
          * The problems with using "new" in your application code (e.g. controllers, jobs, etc.)
          *
-         * - We can't swap it for a mock it in a test.
+         * - We can't swap it for a mocked version it in a test.
          * - We can't make it a singleton if needed.
-         * - We can't depend on an abstract interface like a MailerInterface - we need to know the exact implementation (e.g. SmtpMailer).
-         * - We can't use dependency injection, so the constructor arguments need to be provided every time we need an instance.
-         * - We also don't have a central place to configure them (we don't have "inversion of control").
+         * - We can't depend on an abstract interface like a MailerInterface.
+         * - We can't use dependency injection - constructor args need to be provided every time we need an instance.
+         * - We don't have a central place to configure constructor dependencies (i.e. we don't have "inversion of control").
          */
 
         $this->expectExceptionMessage('Too few arguments');
 
         new SmtpMailer();
     }
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -67,53 +56,35 @@ class ContainerTest extends TestCase
     /** @test */
     public function we_can_provide_instructions_for_resolving_a_class()
     {
-        // $this->markTestSkipped();
-
         $container = Container::getInstance();
 
         /*
-         * Now that we have a singleton service container it's time to start binding things.
-         * Let's start with binding using a closure.
-         * This is really useful when we have a class that needs some logic to be instantiated, such as pulling in config values.
-         * This is an example of "inversion of control" or IoC because we're moving control of how this is instantiated to a central place instead of duplicating it.
-         * Because we're using a closure, it will only be called when we resolve or make the class.
+         * Let's start with binding using a closure!
+         * - Great when a class needs help to be instantiated, such as pulling in config values.
+         * - This is an example of "inversion of control" or IoC.
+         * - Note: The closure is only called when we "resolve" or "make" the class.
          */
         $container->bind(SmtpMailer::class, function () {
             return new SmtpMailer('mail.example.com');
         });
 
         /*
-         * And here we ask the container to give us an instance
-         * Our business logic that requires this class no longer needs to know about what's involved to resolve this
+         * Give us an instance!
+         * The logic for creating the instance is now centralised and shared.
          */
         $smtpMailer = $container->make(SmtpMailer::class);
 
         $this->assertInstanceOf(SmtpMailer::class, $smtpMailer);
 
-        /*
-         * Double check that we get a new instance
-         */
+        // Double check that we get a new instance
         $anotherSmtpMailer = $container->make(SmtpMailer::class);
 
         $this->assertNotSame($smtpMailer, $anotherSmtpMailer);
-
-        /*
-         * This gives us IoC and the ability to mock by binding something different in a test scenario.
-         */
     }
-
-
-
-
-
-
-
 
     /** @test */
     public function we_can_also_use_a_string_for_a_key()
     {
-        // $this->markTestSkipped();
-
         $container = Container::getInstance();
 
         $container->bind('mailer', fn () => new SmtpMailer('mail.example.com'));
@@ -123,27 +94,10 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(SmtpMailer::class, $smtpMailer);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /** @test */
     public function we_can_also_bind_an_interface_to_a_concretion()
     {
-        // $this->markTestSkipped();
+        // Note: Just because we can use interfaces, doesn't mean we always should!
 
         $container = Container::getInstance();
 
@@ -153,28 +107,22 @@ class ContainerTest extends TestCase
 
         $this->assertInstanceOf(SmtpMailer::class, $smtpMailer);
 
-        /* Just because we can use interfaces, doesn't mean we should! */
+        /*
+         * What have we got so far?
+         * - [x] IoC
+         * - [x] Ability to depend on an abstraction or even an arbitrary string name
+         * - [x] Ability to substitute a mock version in a test*
+         * - [ ] Ability to create singletons
+         * - [ ] Dependency injection
+         */
     }
-
-
-
-
-
-
-
-
-
-
-
-
 
     /** @test */
     public function we_can_pass_a_concrete_class_as_the_second_parameter()
     {
-        // $this->markTestSkipped();
-
         $container = Container::getInstance();
 
+        // Sometimes we don't need to provide instructions for resolving a class
         $container->bind(MailerInterface::class, ArrayMailer::class);
 
         $smtpMailer = $container->make(MailerInterface::class);
@@ -192,19 +140,10 @@ class ContainerTest extends TestCase
 
 
 
-
-
     /** @test */
     public function we_can_also_make_classes_weve_never_seen_aka_zero_config_resolution()
     {
-        // $this->markTestSkipped();
-
         $container = Container::getInstance();
-
-        /*
-         * If the container doesn't need instructions for resolving a class, it doesn't need to be registered at all.
-         * This is handy because we can still add a binding just within a test to swap in a mock.
-         */
 
         $smtpMailer = $container->make(ArrayMailer::class);
 
@@ -224,12 +163,9 @@ class ContainerTest extends TestCase
 
 
 
-
     /** @test */
     public function we_can_recursively_resolve()
     {
-        // $this->markTestSkipped();
-
         $container = Container::getInstance();
 
         $container->bind(MailerInterface::class, SmtpMailer::class);
@@ -250,20 +186,9 @@ class ContainerTest extends TestCase
 
 
 
-
-
-
-
-
-
-
-
-
     /** @test */
     public function we_can_also_bind_a_singleton()
     {
-        // $this->markTestSkipped();
-
         $container = Container::getInstance();
 
         /*
@@ -284,29 +209,13 @@ class ContainerTest extends TestCase
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /** @test */
     public function test_it_binds_a_singleton_by_passing_the_instance()
     {
-        // $this->markTestSkipped();
-
         $container = Container::getInstance();
 
         /*
-         * If we want instantiate our singleton manually at the time of registration instead of within a closure, we can do this too.
+         * Sometimes we may want to instantiate our singleton manually at the time of binding.
          * Useful when swapping an instance in a test
          */
 
@@ -334,12 +243,12 @@ class ContainerTest extends TestCase
     /** @test */
     public function test_it_binds_a_singleton_by_class_name_only()
     {
-        // $this->markTestSkipped();
-
         $container = Container::getInstance();
 
         /*
-         * If your singleton class can be instantiated without help, Laravel allows us to just specify the class name on its own and it will new it up for us
+         * If your singleton class can be instantiated without help, Laravel
+         * allows us to just specify the class name on its own and it
+         * will new it up for us.
          */
 
         $container->singleton(ArrayMailer::class);
@@ -355,43 +264,9 @@ class ContainerTest extends TestCase
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /** @test */
     public function test_it_does_dependency_injection()
     {
-        // $this->markTestSkipped();
-
         $container = Container::getInstance();
 
         $mailer = $container->make(ApiMailer::class);
@@ -412,24 +287,28 @@ class ContainerTest extends TestCase
 
 
 
-
-
-
-
-
     /** @test */
     public function test_it_throws_a_binding_resolution_exception_for_an_unregistered_concrete_class_with_unresolvable_dependencies()
     {
-        // $this->markTestSkipped();
-
         $container = Container::getInstance();
-        $container->flush();
 
         $this->expectException(\App\Container\BindingResolutionException::class);
         $this->expectExceptionMessage('Unresolvable dependency');
 
-        $container->make(SmtpMailer::class);
+        $container->make(SnailMailer::class);
     }
+
+    /*
+     * Other things Laravel's container can do
+     *
+     * - Contextual bindings (when X asks for Y)
+     * - Primitive binding
+     * - Extended bindings (decorate existing bindings)
+     * - Aliases
+     * - Dependency resolving extra cases (e.g. variadic args)
+     * - Events
+     * - Tags
+     */
 }
 
 interface MailerInterface
@@ -460,6 +339,18 @@ class SmtpMailer implements MailerInterface
 class ApiMailer implements MailerInterface
 {
     public function __construct(public Api $api)
+    {
+    }
+
+    public function send($message)
+    {
+        // ...
+    }
+}
+
+class SnailMailer implements MailerInterface
+{
+    public function __construct(public string $snailName)
     {
     }
 

@@ -1,0 +1,26 @@
+#!/bin/bash
+
+clear
+
+printf '
+                 |\\\#######\
+                 |#\\\#######\
+                 |##\\\#######\
+                 |###\\\#######\
+                 #####\\\#######\
+        _______,#######|\#######\
+        \W############W  \#######\
+         \W##########W    \#######\
+           "########"      \#######\
+
+                 Jess Archer
+                 -----------
+' | lolcat
+
+printf '
+  Full Stack Developer | Podcaster | Speaker
+
+              @jessarchercodes
+           https://jessarcher.com
+
+' | lolcat
