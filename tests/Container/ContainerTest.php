@@ -11,7 +11,7 @@ class ContainerTest extends TestCase
     public function the_problems_with_new()
     {
         /*
-         * The problems with using "new" in your application code (e.g. controllers, jobs, etc.)
+         * The problems with using the "new" keyword in your application code (e.g. controllers, jobs, etc.)
          *
          * - We can't swap it for a mocked version it in a test.
          * - We can't make it a singleton if needed.
@@ -264,38 +264,14 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(ApiMailer::class, $mailer);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /** @test */
-    public function test_it_throws_a_binding_resolution_exception_for_an_unregistered_concrete_class_with_unresolvable_dependencies()
-    {
-        $container = Container::getInstance();
-
-        $this->expectException(\App\Container\BindingResolutionException::class);
-        $this->expectExceptionMessage('Unresolvable dependency');
-
-        $container->make(SnailMailer::class);
-    }
-
     /*
      * Other things Laravel's container can do
      *
      * - Contextual bindings (when X asks for Y)
-     * - Primitive binding
+     * - Primitive binding (E.g. '$server')
      * - Extended bindings (decorate existing bindings)
      * - Aliases
-     * - Dependency resolving extra cases (e.g. variadic args)
+     * - Extra dependency resolution cases (e.g. variadic arguments)
      * - Events
      * - Tags
      */
@@ -329,18 +305,6 @@ class SmtpMailer implements MailerInterface
 class ApiMailer implements MailerInterface
 {
     public function __construct(public Api $api)
-    {
-    }
-
-    public function send($message)
-    {
-        // ...
-    }
-}
-
-class SnailMailer implements MailerInterface
-{
-    public function __construct(public string $snailName)
     {
     }
 
