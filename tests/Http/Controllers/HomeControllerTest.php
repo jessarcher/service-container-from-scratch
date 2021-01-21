@@ -18,9 +18,24 @@ class HomeControllerTest extends TestCase
 
         $container = Container::getInstance();
 
-        $controller = $container->make(HomeController::class);
+        $response = $container->make(HomeController::class)->index();
 
-        $response = $controller->index();
+        $this->assertEquals('mocked pdf response', $response);
+    }
+
+    public function test_it_can_mock_via_the_facade()
+    {
+        $this->markTestSkipped();
+
+        \App\Facades\Pdf::shouldReceive('generate')->andReturn('mocked pdf response');
+
+        $container = Container::getInstance();
+
+        $response = $container->make(HomeController::class)->index();
+
+        $this->assertEquals('mocked pdf response', $response);
+
+        $response = $container->make(HomeController::class)->index();
 
         $this->assertEquals('mocked pdf response', $response);
     }
