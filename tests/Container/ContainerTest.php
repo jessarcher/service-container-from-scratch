@@ -21,9 +21,9 @@ class ContainerTest extends TestCase
          */
 
         $this->expectExceptionMessage('Too few arguments');
-
         new SmtpMailer();
     }
+
 
 
 
@@ -59,7 +59,6 @@ class ContainerTest extends TestCase
         $container = Container::getInstance();
 
         /*
-         * Let's start with binding using a closure!
          * - Great when a class needs help to be instantiated, such as pulling in config values.
          * - This is an example of "inversion of control" or IoC.
          * - Note: The closure is only called when we "resolve" or "make" the class.
@@ -69,16 +68,15 @@ class ContainerTest extends TestCase
         });
 
         /*
-         * Give us an instance!
          * The logic for creating the instance is now centralised and shared.
          */
         $smtpMailer = $container->make(SmtpMailer::class);
-
         $this->assertInstanceOf(SmtpMailer::class, $smtpMailer);
 
-        // Double check that we get a new instance
+        /*
+         * Double check that we get a new instance each time
+         */
         $anotherSmtpMailer = $container->make(SmtpMailer::class);
-
         $this->assertNotSame($smtpMailer, $anotherSmtpMailer);
     }
 
@@ -113,7 +111,7 @@ class ContainerTest extends TestCase
          * - [x] Ability to depend on an abstraction or even an arbitrary string name
          * - [x] Ability to substitute a mock version in a test*
          * - [ ] Ability to create singletons
-         * - [ ] Dependency injection
+         * - [ ] Recursive dependency injection/resolution
          */
     }
 
@@ -122,15 +120,15 @@ class ContainerTest extends TestCase
     {
         $container = Container::getInstance();
 
-        // Sometimes we don't need to provide instructions for resolving a class
+        /*
+         * Sometimes we don't need to provide instructions for resolving a class
+         */
         $container->bind(MailerInterface::class, ArrayMailer::class);
 
         $smtpMailer = $container->make(MailerInterface::class);
 
         $this->assertInstanceOf(ArrayMailer::class, $smtpMailer);
     }
-
-
 
 
 
@@ -191,13 +189,6 @@ class ContainerTest extends TestCase
     {
         $container = Container::getInstance();
 
-        /*
-         * We talked about singletons earlier with the container itself.
-         * Now let's give our container the ability to resolve singleton classes.
-         * As above, we'll be providing a closure as the "instructions" for how to instantiate our class.
-         * The only difference is that the closure will only be called the first time we resolve the class.
-         * We will store the instance so that we can return it every other time.
-         */
         $container->singleton(SmtpMailer::class, fn () => new SmtpMailer('mail.example.com'));
 
         $smtpMailer1 = $container->make(SmtpMailer::class);
@@ -209,15 +200,17 @@ class ContainerTest extends TestCase
 
 
 
+
+
+
+
+
+
+
     /** @test */
     public function test_it_binds_a_singleton_by_passing_the_instance()
     {
         $container = Container::getInstance();
-
-        /*
-         * Sometimes we may want to instantiate our singleton manually at the time of binding.
-         * Useful when swapping an instance in a test
-         */
 
         $instance = new ArrayMailer();
         $container->instance(ArrayMailer::class, $instance);
@@ -238,18 +231,10 @@ class ContainerTest extends TestCase
 
 
 
-
-
     /** @test */
     public function test_it_binds_a_singleton_by_class_name_only()
     {
         $container = Container::getInstance();
-
-        /*
-         * If your singleton class can be instantiated without help, Laravel
-         * allows us to just specify the class name on its own and it
-         * will new it up for us.
-         */
 
         $container->singleton(ArrayMailer::class);
 
@@ -259,6 +244,11 @@ class ContainerTest extends TestCase
         $this->assertSame($smtpMailer1, $smtpMailer2);
         $this->assertInstanceOf(ArrayMailer::class, $smtpMailer1);
     }
+
+
+
+
+
 
 
 
