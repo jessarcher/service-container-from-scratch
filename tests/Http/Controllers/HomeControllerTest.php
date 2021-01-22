@@ -34,9 +34,5 @@ class HomeControllerTest extends TestCase
         $response = $container->make(HomeController::class)->index();
 
         $this->assertEquals('mocked pdf response', $response);
-
-        $response = $container->make(HomeController::class)->index();
-
-        $this->assertEquals('mocked pdf response', $response);
     }
 }
