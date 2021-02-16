@@ -21,7 +21,7 @@ class Container
 
     public static function getInstance(): static
     {
-        if (is_null(static::$instance)) {
+        if (!isset(static::$instance)) {
             static::$instance = new static();
         }
 
