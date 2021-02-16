@@ -6,7 +6,6 @@ use Closure;
 
 class Container
 {
-    /** @var static */
     protected static $instance;
 
     /** @var array[] */
@@ -21,7 +20,7 @@ class Container
 
     public static function getInstance(): static
     {
-        if (is_null(static::$instance)) {
+        if (!isset(static::$instance)) {
             static::$instance = new static();
         }
 
