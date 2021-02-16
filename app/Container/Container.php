@@ -6,6 +6,7 @@ use Closure;
 
 class Container
 {
+    /** @var static */
     protected static $instance;
 
     /** @var array[] */
